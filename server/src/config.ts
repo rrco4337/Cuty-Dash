@@ -13,7 +13,13 @@ export const config = {
   sessionSecret: required('SESSION_SECRET'),
   clientUrl: required('CLIENT_URL'),
   port: Number(process.env.PORT ?? 3001),
-  scopes: 'user-read-private user-top-read',
+  scopes: [
+    'user-read-private', // profil
+    'user-top-read', // top artistes / titres
+    'user-read-recently-played', // historique
+    'user-read-playback-state', // lecture en cours
+    'user-modify-playback-state', // play / pause / suivant / précédent
+  ].join(' '),
 };
 
 if (missing.length > 0) {

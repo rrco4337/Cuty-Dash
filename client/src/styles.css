@@ -1,47 +1,21 @@
+/* Couleurs et base communes */
 :root {
-  --bg: #fff5f9;
-  --card: #ffffff;
-  --text: #4a3b47;
-  --accent: #ff8fb8;
-  --accent-dark: #e86a9a;
-  font-family: system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
-}
-
-body { margin: 0; }
-main { max-width: 640px; margin: 0 auto; padding: 2rem 1rem; }
-main.center { text-align: center; padding-top: 20vh; }
-h1, h2 { margin: 0 0 1rem; }
-
-.card { background: var(--card); border-radius: 20px; padding: 1rem; box-shadow: 0 4px 16px rgb(255 143 184 / 20%); }
-.profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
-.profile h1 { flex: 1; margin: 0; font-size: 1.4rem; }
-.avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-.avatar-fallback { display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 700; font-size: 1.5rem; }
-
-.btn { display: inline-block; border: 0; border-radius: 999px; padding: 0.7rem 1.4rem; background: var(--accent); color: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
-.btn:hover { background: var(--accent-dark); }
-.btn-ghost { background: transparent; color: var(--accent-dark); border: 2px solid var(--accent); }
-
-.artists { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
-.artist { display: flex; align-items: center; gap: 1rem; }
-.artist a { color: var(--text); font-weight: 600; text-decoration: none; }
-.artist-img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; }
-.error { color: #c0334f; }
-
-/* Login: retro pixel window */
-.login-page {
   --ink: #3d2463;
+  --muted: #6b4f8a;
   --pink: #f9c5d9;
   --pink-deep: #f48fb1;
   --violet: #b07fd6;
-  min-height: 100vh;
-  max-width: none;
-  box-sizing: border-box;
-  padding: 120px 16px 40px;
-  display: grid;
-  place-items: center;
+  --violet-deep: #9b6bd6;
+  --lavender: #d1b3ff;
+  --error: #c0334f;
+}
+
+body { margin: 0; }
+h1, h2, h3, p { margin: 0; }
+
+/* Fond à carreaux + police pixel, partagés par le login et le dashboard */
+.login-page,
+.dashboard {
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   color: var(--ink);
   background-color: #fff0f7;
@@ -49,6 +23,37 @@ h1, h2 { margin: 0 0 1rem; }
     linear-gradient(#fbdceb 1px, transparent 1px),
     linear-gradient(90deg, #fbdceb 1px, transparent 1px);
   background-size: 32px 32px;
+}
+
+.error { color: var(--error); }
+.hint { color: var(--muted); }
+.ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.btn {
+  display: inline-block;
+  box-sizing: border-box;
+  border: 0;
+  padding: 12px 20px;
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--pink-deep);
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--pink-deep); }
+.btn:focus-visible { outline: 3px solid var(--violet); outline-offset: 4px; }
+
+/* Login: retro pixel window */
+.login-page {
+  min-height: 100vh;
+  max-width: none;
+  box-sizing: border-box;
+  padding: 120px 16px 40px;
+  display: grid;
+  place-items: center;
 }
 
 .login-window {
@@ -150,4 +155,182 @@ h1, h2 { margin: 0 0 1rem; }
 @media (max-width: 480px) {
   .login-body { padding: 20px 20px 28px; }
   .login-body h2 { font-size: 1.5rem; }
+}
+
+
+/* ---------- Dashboard ---------- */
+
+.dashboard {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 40px 24px 72px;
+}
+
+.dash-header,
+.dash-grid { max-width: 1328px; margin-inline: auto; }
+
+.dash-header { display: flex; align-items: center; gap: 20px; }
+.dash-header h1 { font-size: 2.2rem; line-height: 1.1; }
+
+/* La grille : chaque bloc choisit sa place avec `grid-area` (la classe area-… de Dashboard.tsx) */
+.dash-grid {
+  margin-top: 120px; /* de la place pour le chat au-dessus de la 1re fenêtre */
+  display: grid;
+  gap: 40px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-areas:
+    'now profile'
+    'artists tracks'
+    'genres tracks'
+    'recent recent';
+}
+.area-now { grid-area: now; }
+.area-profile { grid-area: profile; }
+.area-artists { grid-area: artists; }
+.area-tracks { grid-area: tracks; }
+.area-genres { grid-area: genres; }
+.area-recent { grid-area: recent; }
+
+/* Fenêtre rétro */
+.window {
+  position: relative; /* le chat se place par rapport à elle */
+  min-width: 0;
+  background: #fff;
+  border: 4px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--pink-deep);
+}
+.window-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  background: var(--pink);
+  border-bottom: 4px solid var(--ink);
+}
+.window-bar h2 { flex: 1; font-size: 1.15rem; font-weight: 600; }
+.window-body { padding: 24px; }
+
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+.bars i { width: 4px; background: var(--violet-deep); }
+.bars i:nth-child(1) { height: 60%; background: var(--ink); }
+.bars i:nth-child(2) { height: 100%; }
+.bars i:nth-child(3) { height: 40%; background: var(--pink-deep); }
+
+/* Boutons de période */
+.tabs { display: flex; gap: 8px; }
+.tab {
+  padding: 4px 10px;
+  border: 3px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.tab[aria-pressed='true'] { background: var(--ink); color: #fff; }
+.tab:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+
+/* En ce moment */
+.now { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: center; }
+.now .vinyl { width: 240px; }
+.vinyl-label--cover { width: 38%; overflow: hidden; }
+.vinyl-label--cover img { width: 100%; height: 100%; object-fit: cover; }
+.vinyl--spin { animation: spin 8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.now-info { display: grid; gap: 10px; min-width: 0; }
+.now-title { color: var(--ink); font-size: 1.8rem; font-weight: 600; line-height: 1.15; text-decoration: none; overflow-wrap: anywhere; }
+.now-artist { font-size: 1.2rem; }
+
+.progress { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; height: 14px; padding: 3px; border: 3px solid var(--ink); margin-top: 8px; }
+.progress i { background: #fdeaf3; }
+.progress i.on { background: var(--pink-deep); }
+.times { display: flex; justify-content: space-between; color: var(--muted); }
+
+.controls { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+.ctl {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  background: var(--pink);
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--violet-deep);
+}
+.ctl--main { width: 68px; height: 68px; background: var(--ink); box-shadow: 0 6px 0 var(--pink-deep); }
+.ctl:active { transform: translateY(4px); box-shadow: none; }
+.ctl:focus-visible { outline: 3px solid var(--violet); outline-offset: 4px; }
+
+/* Profil */
+.profile { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.profile-pic { width: 160px; height: 160px; border: 4px solid var(--ink); object-fit: cover; }
+.profile-pic--empty { display: grid; place-items: center; background: var(--pink); font-size: 3rem; }
+.profile h3 { font-size: 1.5rem; }
+.profile .btn { width: 100%; }
+.btn--light { background: #fff; color: var(--ink); border: 3px solid var(--ink); }
+
+/* Top artistes */
+.artists { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; text-align: center; }
+.artists a { display: grid; gap: 8px; color: var(--ink); text-decoration: none; }
+.artist-pic { width: 100%; aspect-ratio: 1; border: 4px solid var(--ink); border-radius: 50%; object-fit: cover; box-sizing: border-box; }
+.artist-pic--empty { display: grid; place-items: center; background: var(--pink); font-size: 2rem; }
+
+/* Top titres */
+.tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.track { display: flex; align-items: center; gap: 12px; }
+.track-rank { flex: none; width: 36px; height: 36px; display: grid; place-items: center; color: #fff; border: 3px solid var(--ink); background: linear-gradient(135deg, var(--pink-deep), var(--violet-deep)); }
+.track-text { flex: 1; min-width: 0; }
+.track-text a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.track-text a:hover { text-decoration: underline; }
+
+/* Genres */
+.genres { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.genre { display: grid; align-content: space-between; aspect-ratio: 1; padding: 12px; color: var(--ink); border: 4px solid var(--ink); overflow-wrap: anywhere; }
+.genre span { color: var(--ink); font-size: 0.9rem; }
+.genre:nth-child(1) { background: linear-gradient(135deg, var(--pink), var(--pink-deep)); }
+.genre:nth-child(2) { background: linear-gradient(135deg, var(--pink), var(--lavender)); }
+.genre:nth-child(3) { background: linear-gradient(135deg, var(--pink-deep), var(--violet-deep)); color: #fff; }
+.genre:nth-child(4) { background: linear-gradient(135deg, #fff0f6, var(--lavender)); }
+.genre:nth-child(5) { background: linear-gradient(135deg, var(--lavender), var(--pink-deep)); }
+.genre:nth-child(3) span { color: #fff; }
+
+/* Écoutés récemment */
+.recent { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; }
+.recent a { display: grid; gap: 6px; color: var(--ink); text-decoration: none; }
+.cover { width: 100%; aspect-ratio: 1; border: 4px solid var(--ink); object-fit: cover; box-sizing: border-box; background: var(--pink); }
+
+/* Écrans moyens et petits : tout passe sur une colonne */
+@media (max-width: 1000px) {
+  .dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'now' 'profile' 'artists' 'tracks' 'genres' 'recent';
+  }
+  .artists, .recent { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .genres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .now { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .now-info { width: 100%; }
+  .window-body { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl--spin { animation: none; }
+}
+
+/* Papillon : monte de 6 px puis redescend, en 2 positions seulement */
+.butterfly {
+  position: absolute;
+  image-rendering: pixelated;
+  animation: butterfly-float 1.2s steps(1, end) infinite;
+}
+@keyframes butterfly-float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .butterfly { animation: none; }
 }

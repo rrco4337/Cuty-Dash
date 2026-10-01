@@ -1,7 +1,6 @@
 import { apiLogout } from './api/client';
 import LoginCard from './components/LoginCard';
-import ProfileCard from './components/ProfileCard';
-import TopArtists from './components/TopArtists';
+import Dashboard from './components/Dashboard';
 import { useApi } from './hooks/useApi';
 import type { Me } from './types';
 
@@ -25,10 +24,5 @@ export default function App() {
     void apiLogout().then(() => window.location.assign('/'));
   };
 
-  return (
-    <main>
-      <ProfileCard me={me.data} onLogout={logout} />
-      <TopArtists />
-    </main>
-  );
+  return <Dashboard me={me.data} onLogout={logout} />;
 }

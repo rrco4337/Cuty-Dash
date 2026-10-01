@@ -18,4 +18,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const apiGet = <T>(path: string) => request<T>(path);
 
+export const apiPost = (path: string) => request<unknown>(path, { method: 'POST' });
+
 export const apiLogout = () => request<void>('/auth/logout', { method: 'POST' });

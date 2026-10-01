@@ -6,7 +6,7 @@ interface PixelArtProps {
 }
 
 // '.' = transparent; every other char is looked up in the palette.
-function PixelArt({ rows, palette, size, className }: PixelArtProps) {
+export function PixelArt({ rows, palette, size, className }: PixelArtProps) {
   const width = Math.max(...rows.map((r) => r.length));
   return (
     <svg

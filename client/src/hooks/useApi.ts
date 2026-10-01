@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, apiGet } from '../api/client';
 
 export type ApiState<T> =
@@ -7,12 +7,23 @@ export type ApiState<T> =
   | { status: 'error'; message: string }
   | { status: 'ready'; data: T };
 
-export function useApi<T>(path: string): ApiState<T> {
+// Charge `path` au montage et à chaque changement de `path`.
+// - refreshMs : recharge automatiquement toutes les X ms (sans repasser par « loading »)
+// - reload    : recharge à la demande
+export function useApi<T>(path: string, refreshMs?: number) {
   const [state, setState] = useState<ApiState<T>>({ status: 'loading' });
+  const [reloadCount, setReloadCount] = useState(0);
+  const loadedPath = useRef<string | null>(null);
+
+  const reload = useCallback(() => setReloadCount((n) => n + 1), []);
 
   useEffect(() => {
     let cancelled = false;
-    setState({ status: 'loading' });
+    // On n'affiche « loading » que quand l'adresse change, pas à chaque rechargement.
+    if (loadedPath.current !== path) {
+      loadedPath.current = path;
+      setState({ status: 'loading' });
+    }
     apiGet<T>(path)
       .then((data) => {
         if (!cancelled) setState({ status: 'ready', data });
@@ -31,7 +42,13 @@ export function useApi<T>(path: string): ApiState<T> {
     return () => {
       cancelled = true;
     };
-  }, [path]);
+  }, [path, reloadCount]);
 
-  return state;
+  useEffect(() => {
+    if (!refreshMs) return;
+    const id = setInterval(reload, refreshMs);
+    return () => clearInterval(id);
+  }, [refreshMs, reload]);
+
+  return { ...state, reload };
 }

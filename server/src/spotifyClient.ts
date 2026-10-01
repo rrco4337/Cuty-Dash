@@ -86,7 +86,12 @@ async function refresh(tokens: Tokens): Promise<Tokens> {
   }
 }
 
-export async function spotifyGet<T>(session: Request['session'], path: string): Promise<T> {
+// Appel brut : rafraîchit le token si besoin, puis appelle l'API Spotify.
+async function spotifyFetch(
+  session: Request['session'],
+  method: 'GET' | 'PUT' | 'POST',
+  path: string,
+): Promise<Response> {
   let tokens = session.tokens;
   if (!tokens) throw new AuthExpiredError();
 
@@ -96,9 +101,33 @@ export async function spotifyGet<T>(session: Request['session'], path: string): 
   }
 
   const res = await fetch(`${API_URL}${path}`, {
+    method,
     headers: { Authorization: `Bearer ${tokens.accessToken}` },
   });
   if (res.status === 401) throw new AuthExpiredError();
-  if (!res.ok) throw new SpotifyError(res.status, `Erreur API Spotify (${res.status})`);
+  return res;
+}
+
+function errorMessage(status: number): string {
+  if (status === 403) return 'Spotify Premium est nécessaire pour piloter la lecture.';
+  if (status === 404) return 'Aucun appareil Spotify actif : ouvre Spotify puis réessaie.';
+  return `Erreur API Spotify (${status})`;
+}
+
+// Lit des données. Renvoie null quand Spotify répond « 204 : rien à afficher ».
+export async function spotifyGet<T>(session: Request['session'], path: string): Promise<T | null> {
+  const res = await spotifyFetch(session, 'GET', path);
+  if (res.status === 204) return null;
+  if (!res.ok) throw new SpotifyError(res.status, errorMessage(res.status));
   return (await res.json()) as T;
+}
+
+// Envoie une commande (play, pause…). Spotify ne renvoie pas de contenu.
+export async function spotifySend(
+  session: Request['session'],
+  method: 'PUT' | 'POST',
+  path: string,
+): Promise<void> {
+  const res = await spotifyFetch(session, method, path);
+  if (!res.ok) throw new SpotifyError(res.status, errorMessage(res.status));
 }

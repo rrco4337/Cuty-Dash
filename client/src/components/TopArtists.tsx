@@ -1,35 +1,39 @@
+import { useState } from 'react';
 import { useApi } from '../hooks/useApi';
-import type { Artist } from '../types';
+import { firstImage } from '../lib';
+import type { Artist, TimeRange } from '../types';
+import Loaded from './Loaded';
+import RangeTabs from './RangeTabs';
+import Window from './Window';
 
-export default function TopArtists() {
-  const state = useApi<{ items: Artist[] }>('/spotify/top-artists');
-
-  if (state.status === 'loading') return <p>Chargement des artistes…</p>;
-  if (state.status === 'anonymous') return <p className="error">Session expirée, rechargez la page.</p>;
-  if (state.status === 'error') return <p className="error">{state.message}</p>;
-
-  const artists = state.data.items;
-  if (artists.length === 0) {
-    return <p>Pas encore assez d'écoutes pour afficher vos artistes.</p>;
-  }
+export default function TopArtists({ className }: { className?: string }) {
+  const [range, setRange] = useState<TimeRange>('medium_term');
+  const state = useApi<{ items: Artist[] }>(`/spotify/top-artists?limit=6&range=${range}`);
 
   return (
-    <section>
-      <h2>Vos top artistes</h2>
-      <ol className="artists">
-        {artists.map((artist) => (
-          <li key={artist.id} className="card artist">
-            {artist.images[0] ? (
-              <img className="artist-img" src={artist.images[0].url} alt="" />
-            ) : (
-              <div className="artist-img avatar-fallback">{artist.name.charAt(0)}</div>
-            )}
-            <a href={artist.external_urls.spotify} target="_blank" rel="noreferrer">
-              {artist.name}
-            </a>
-          </li>
-        ))}
-      </ol>
-    </section>
+    <Window title="Top artistes" className={className} action={<RangeTabs value={range} onChange={setRange} />}>
+      <Loaded state={state}>
+        {({ items }) =>
+          items.length === 0 ? (
+            <p className="hint">Pas encore assez d'écoutes sur cette période.</p>
+          ) : (
+            <ol className="artists">
+              {items.map((artist) => (
+                <li key={artist.id}>
+                  <a href={artist.external_urls.spotify} target="_blank" rel="noreferrer">
+                    {firstImage(artist.images) ? (
+                      <img className="artist-pic" src={firstImage(artist.images)} alt="" />
+                    ) : (
+                      <span className="artist-pic artist-pic--empty">{artist.name.charAt(0)}</span>
+                    )}
+                    <span className="ellipsis">{artist.name}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </Loaded>
+    </Window>
   );
 }
