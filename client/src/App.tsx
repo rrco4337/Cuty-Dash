@@ -1,5 +1,5 @@
 import { apiLogout } from './api/client';
-import LoginButton from './components/LoginButton';
+import LoginCard from './components/LoginCard';
 import ProfileCard from './components/ProfileCard';
 import TopArtists from './components/TopArtists';
 import { useApi } from './hooks/useApi';
@@ -13,10 +13,8 @@ export default function App() {
 
   if (me.status === 'anonymous') {
     return (
-      <main className="center">
-        <h1>Cute Dashboard</h1>
-        {urlError && <p className="error">Connexion impossible ({urlError}).</p>}
-        <LoginButton />
+      <main className="login-page">
+        <LoginCard error={urlError} />
       </main>
     );
   }
